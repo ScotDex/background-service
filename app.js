@@ -9,8 +9,8 @@ app.use(cors());
 
 // 1. Load your credentials
 const sslOptions = {
-    key: fs.readFileSync(path.join(__dirname, 'ssl', 'key.pem')), // or .key
-    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pem'))
+    key: fs.readFileSync(path.join(__dirname, 'ssl', 'voidspark.org.key')), // or .key
+    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'voidspark.org.pem'))
 };
 
 const BG_DIR = path.join(__dirname, 'backgrounds');
