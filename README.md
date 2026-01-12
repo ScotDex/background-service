@@ -10,7 +10,7 @@ A high-performance "sidecar" container designed to serve randomized high-fidelit
 
 ## Asset Credits
 Background imagery used with the express permission of **Rixx Javix** (@RixxJavix). 
-*Check out more of his incredible EVE Online photography and art at [dev-blog.eveage.com](https://dev-blog.eveage.com).*
+*Check out more of his incredible EVE Online photography and art at https://www.flickr.com/photos/rixxjavix/albums/
 
 ## API Endpoints
 
