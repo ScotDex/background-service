@@ -1,0 +1,19 @@
+services:
+  api-service:
+    build: .
+    restart: always
+    ports:
+      8080:8080
+    volumes:
+    - "./backgrounds:/usr/src/app/backgrounds"
+    deploy:
+      resources:
+        limits:
+          memory: 128M  # Hard cap on RAM
+          cpus: '0.10'   # Only use 10% of one CPU core
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
