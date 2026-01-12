@@ -6,6 +6,7 @@ services:
     - 2053:2053
     volumes:
     - "./backgrounds:/usr/src/app/backgrounds"
+    - "./ssl:/usr/src/app/ssl"
     deploy:
       resources:
         limits:
