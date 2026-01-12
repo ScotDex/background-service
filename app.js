@@ -17,10 +17,10 @@ app.get('/random', (req, res) => {
         const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
         const randomImage = images[Math.floor(Math.random() * images.length)];
         res.json({
-            url: `http://localhost:8080/images/${randomImage}`,
+            url: `http://api.voidspark.org:2053/images/${randomImage}`,
             name: randomImage
         });
     });
 });
 
-app.listen(8080, '0.0.0.0', () => console.log("Nebula Provider Online"));
+app.listen(2053, '0.0.0.0', () => console.log("Nebula Provider Online"));

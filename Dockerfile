@@ -13,7 +13,7 @@ RUN npm ci --only=production
 # Step 5: Copy the rest of your bot code
 COPY . .
 
-EXPOSE 8080
+EXPOSE 2053
 
 # Step 6: Define environment variables (Can be overridden in GCP console)
 ENV NODE_ENV=production
