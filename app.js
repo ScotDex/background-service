@@ -17,7 +17,7 @@ app.get('/random', (req, res) => {
         const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
         const randomImage = images[Math.floor(Math.random() * images.length)];
         res.json({
-            url: `http://api.voidspark.org:2053/images/${randomImage}`,
+            url: `https://api.voidspark.org:2053/images/${randomImage}`,
             name: randomImage
         });
     });
