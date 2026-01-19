@@ -72,7 +72,7 @@ app.get('/render/ship/:typeId', async (req, res) => {
     }
 });
 
-// --- Nebula Provider ---
+// -- Image Rotation -- 
 app.get('/random', (req, res) => {
     fs.readdir(BG_DIR, (err, files) => {
         if (err || !files.length) return res.status(500).json({ error: "No images found" });
@@ -88,5 +88,5 @@ app.get('/random', (req, res) => {
 
 // --- Boot ---
 https.createServer(sslOptions, app).listen(2053, '0.0.0.0', () => {
-    console.log("🔒 Nebula Provider & Render Proxy Online: https://api.voidspark.org:2053");
+    console.log("Image Proxy Online: https://api.voidspark.org:2053");
 });
