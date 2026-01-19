@@ -12,6 +12,7 @@ app.use(cors());
 // --- Persistence Layer ---
 const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
 if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+if (!fs.existsSync(CORP_DIR)) fs.mkdirSync(CORP_DIR, { recursive: true });
 
 // --- SSL Config ---
 const sslOptions = {
@@ -69,6 +70,54 @@ app.get('/render/ship/:typeId', async (req, res) => {
     } catch (err) {
         res.set('Cache-Control', 'no-store'); 
         res.status(404).json({ error: "Ship render unavailable" });
+    }
+});
+
+// --- Corp Logo Proxy ---
+app.get('/render/corp/:corpId', async (req, res) => {
+    const { corpId } = req.params;
+    const localPath = path.join(CORP_CACHE, `${corpId}.png`);
+
+    // 1. Serve from SSD if available
+    if (fs.existsSync(localPath)) {
+        res.set('Cache-Control', 'public, max-age=31536000, immutable'); 
+        return res.sendFile(localPath);
+    }
+
+    // 2. Coalesce Requests (Reuse your existing pendingRequests Map)
+    const requestKey = `corp_${corpId}`; // Unique key to prevent collision with ship IDs
+    if (pendingRequests.has(requestKey)) {
+        await pendingRequests.get(requestKey);
+        return res.sendFile(localPath);
+    }
+
+    // 3. The Fetch Logic
+    const fetchPromise = (async () => {
+        try {
+            // EVE Image Server endpoint for corporation logos
+            const ccpUrl = `https://images.evetech.net/corporations/${corpId}/logo?size=64`;
+            const response = await axios({ url: ccpUrl, responseType: 'stream' });
+
+            if (response.status !== 200) throw new Error('CCP Server Error');
+
+            await pipeline(response.data, fs.createWriteStream(localPath));
+        } catch (err) {
+            console.error(`[PROXY ERROR] Corp ${corpId}: ${err.message}`);
+            throw err;
+        } finally {
+            pendingRequests.delete(requestKey);
+        }
+    })();
+
+    pendingRequests.set(requestKey, fetchPromise);
+
+    try {
+        await fetchPromise;
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        res.sendFile(localPath);
+    } catch (err) {
+        res.set('Cache-Control', 'no-store'); 
+        res.status(404).json({ error: "Corp logo unavailable" });
     }
 });
 
