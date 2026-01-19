@@ -11,6 +11,7 @@ app.use(cors());
 
 // --- Persistence Layer ---
 const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
+const CORP_DIR = path.join(__dirname, 'cache', 'corps');
 if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
 if (!fs.existsSync(CORP_DIR)) fs.mkdirSync(CORP_DIR, { recursive: true });
 
