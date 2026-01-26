@@ -5,6 +5,9 @@ const express = require('express');
 const cors = require('cors');
 const { pipeline } = require('node:stream/promises');
 const axios = require('axios'); // Ensure this is installed: npm install axios
+const cron = require('node-cron');
+
+// --- Express App ---
 
 const app = express();
 app.use(cors());
@@ -12,6 +15,12 @@ app.use(cors());
 // --- Persistence Layer ---
 const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
 const CORP_DIR = path.join(__dirname, 'cache', 'corps');
+const STATUS_DIR = path.join(__dirname, 'cache');
+
+const STATUS_CACHE_FILE = path.join(__dirname, 'cache', 'server_status.json');
+
+// -- Directory Creation ---
+if (!fs.existsSync(STATUS_DIR)) fs.mkdirSync(STATUS_DIR, { recursive: true });
 if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
 if (!fs.existsSync(CORP_DIR)) fs.mkdirSync(CORP_DIR, { recursive: true });
 
@@ -136,7 +145,49 @@ app.get('/random', (req, res) => {
     });
 });
 
+async function refreshServerStatus() {
+    console.log(`[${new Date().toISOString()}] Refreshing EVE Status...`);
+    try {
+        const response = await axios.get('https://esi.evetech.net/latest/status/', {
+            headers: {
+                'X-Compatibility-Date': '2025-12-16',
+                'User-Agent': 'voidspark.org',
+            }
+        });
+
+        const statusData = {
+            players: response.data.players,
+            version: response.data.server_version,
+            startTime: response.data.start_time,
+            lastUpdated: new Date().toISOString(),
+        };
+        await fs.promises.writeFile(STATUS_CACHE_FILE, JSON.stringify(statusData, null, 2));
+        console.log(`[${new Date().toISOString()}] Server Status Updated`);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error refreshing server status: ${error.message}`);
+    } 
+}
+
+app.get('/api/eve/status', async (req, res) => {
+    try {
+        if (!fs.existsSync(STATUS_CACHE_FILE)) {
+            return res.status(503).json({ error: "Server status data initializing..." });
+        }
+        const data = await fs.promises.readFile(STATUS_CACHE_FILE, 'utf8');
+        res.json(JSON.parse(data));
+    } catch (err){
+        res.status(500).json({ error: err.message });
+    }  
+});
+
+// Schedule: Every 15 minutes (Minute 0, 15, 30, 45)
+cron.schedule('*/15 * * * *', refreshServerStatus);
+
+// Initial run to ensure the file exists for the first users
+refreshServerStatus();
+
 // --- Boot ---
 https.createServer(sslOptions, app).listen(2053, '0.0.0.0', () => {
     console.log("Image Proxy Online: https://api.voidspark.org:2053");
 });
+
