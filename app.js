@@ -168,7 +168,7 @@ async function refreshServerStatus() {
     } 
 }
 
-app.get('/api/eve/status', async (req, res) => {
+app.get('/eve/status', async (req, res) => {
     try {
         if (!fs.existsSync(STATUS_CACHE_FILE)) {
             return res.status(503).json({ error: "Server status data initializing..." });
