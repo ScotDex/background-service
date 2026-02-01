@@ -17,6 +17,7 @@ const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
 const CORP_DIR = path.join(__dirname, 'cache', 'corps');
 const STATUS_DIR = path.join(__dirname, 'cache');
 const NPC_KILLS_CACHE_FILE = path.join(__dirname, 'cache', 'npc_kills.json');
+const NPC_LIFETIME_FILE = path.join(STATUS_DIR, 'npc_lifetime.json');
 
 const STATUS_CACHE_FILE = path.join(__dirname, 'cache', 'server_status.json');
 
@@ -92,13 +93,23 @@ async function refreshNPCKills () {
         });
 
         const rawData = response.data;
-        const totalNPCkills = rawData.reduce((acc, system) => acc + (system.npc_kills || 0), 0);
+        const snapshotTotal = rawData.reduce((acc, system) => acc + (system.npc_kills || 0), 0);
+
+        let lifetimeTotal = snapshotTotal; // Default to current snapshot if no file exists
+        
+        if (fs.existsSync(NPC_LIFETIME_FILE)) {
+            const storedData = JSON.parse(await fs.promises.readFile(NPC_LIFETIME_FILE, 'utf8'));
+            // ADD the new snapshot to the old total
+            lifetimeTotal = (storedData.lifetimeTotal || 0) + snapshotTotal;
+        }
+
         const npcData = {
-            total: totalNPCkills,
+            total: snapshotTotal,
+            lifetimeTotal: lifetimeTotal,
             systemsActive: rawData.length,
             lastUpdated: new Date().toISOString(),
         };
-
+        await fs.promises.writeFile(NPC_LIFETIME_FILE, JSON.stringify(npcData, null, 2));
         await fs.promises.writeFile(NPC_KILLS_CACHE_FILE, JSON.stringify(npcData, null, 2));
         console.log(`[${new Date().toISOString()}] NPC Kills Updated`);
     } catch (error) {
