@@ -16,6 +16,7 @@ app.use(cors());
 const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
 const CORP_DIR = path.join(__dirname, 'cache', 'corps');
 const STATUS_DIR = path.join(__dirname, 'cache');
+const NPC_KILLS_CACHE_FILE = path.join(__dirname, 'cache', 'npc_kills.json');
 
 const STATUS_CACHE_FILE = path.join(__dirname, 'cache', 'server_status.json');
 
@@ -82,6 +83,30 @@ app.get('/render/ship/:typeId', async (req, res) => {
         res.status(404).json({ error: "Ship render unavailable" });
     }
 });
+
+async function refreshNPCKills () {
+    console.log (`[${new Date().toISOString()}] Refreshing Global NPC Kills...`);
+    try {
+        const response = await axios.get('https://esi.evetech.net/latest/universe/system_kills/', {
+            headers: { 'User-Agent': 'voidspark.org-npc-monitor' }
+        });
+
+        const rawData = response.data;
+        const totalNPCkills = rawData.reduce((acc, system) => acc + (system.npc_kills || 0), 0);
+        const npcData = {
+            total: totalNPCkills,
+            systemsActive: rawData.length,
+            lastUpdated: new Date().toISOString(),
+        };
+
+        await fs.promises.writeFile(NPC_KILLS_CACHE_FILE, JSON.stringify(npcData, null, 2));
+        console.log(`[${new Date().toISOString()}] NPC Kills Updated`);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error refreshing NPC Kills: ${error.message}`);
+
+    }
+    
+}
 
 // --- Corp Logo Proxy ---
 app.get('/render/corp/:corpId', async (req, res) => {
@@ -180,11 +205,28 @@ app.get('/eve/status', async (req, res) => {
     }  
 });
 
+
+app.get('/stats/npc-kills', async (req, res) => {
+    try {
+        if (!fs.existsSync(NPC_KILLS_CACHE_FILE)) {
+            return res.status(503).json({ error: "NPC data initializing..." });
+        }
+        const data = await fs.promises.readFile(NPC_KILLS_CACHE_FILE, 'utf8');
+        res.set('Cache-Control', 'public, max-age=300'); // Tell client to cache for 5 mins
+        res.json(JSON.parse(data));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Schedule: Every 15 minutes (Minute 0, 15, 30, 45)
 cron.schedule('*/15 * * * *', refreshServerStatus);
 
+cron.schedule('5 * * * *', refreshNPCKills);
+
 // Initial run to ensure the file exists for the first users
 refreshServerStatus();
+refreshNPCKills();
 
 // --- Boot ---
 https.createServer(sslOptions, app).listen(2053, '0.0.0.0', () => {
