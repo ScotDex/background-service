@@ -28,8 +28,8 @@ if (!fs.existsSync(CORP_DIR)) fs.mkdirSync(CORP_DIR, { recursive: true });
 
 // --- SSL Config ---
 const sslOptions = {
-    key: fs.readFileSync(path.join(__dirname, 'ssl', 'voidspark.org.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'voidspark.org.pem'))
+    key: fs.readFileSync(path.join(__dirname, 'ssl', 'socketkillcom.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'socketkillcom.pem'))
 };
 
 // --- Static Assets ---
@@ -175,7 +175,7 @@ app.get('/random', (req, res) => {
         const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
         const randomImage = images[Math.floor(Math.random() * images.length)];
         res.json({
-            url: `https://api.voidspark.org:2053/images/${randomImage}`,
+            url: `https://api.socketkill.com:2053/images/${randomImage}`,
             name: randomImage
         });
     });
@@ -241,6 +241,11 @@ refreshNPCKills();
 
 // --- Boot ---
 https.createServer(sslOptions, app).listen(2053, '0.0.0.0', () => {
+<<<<<<< HEAD
     console.log("Image Proxy Online: https://api.voidspark.org:2053");
 });
 
+=======
+    console.log("Image Proxy Online: https://api.socketkill.com:2053");
+});
+>>>>>>> b8bc2ce (domain transition)
