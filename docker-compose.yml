@@ -7,6 +7,7 @@ services:
     volumes:
     - "./backgrounds:/usr/src/app/backgrounds"
     - "./ssl:/usr/src/app/ssl"
+    - "./cache:/usr/src/app/cache"
     deploy:
       resources:
         limits:
