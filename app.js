@@ -241,11 +241,6 @@ refreshNPCKills();
 
 // --- Boot ---
 https.createServer(sslOptions, app).listen(2053, '0.0.0.0', () => {
-<<<<<<< HEAD
-    console.log("Image Proxy Online: https://api.voidspark.org:2053");
-});
-
-=======
     console.log("Image Proxy Online: https://api.socketkill.com:2053");
 });
->>>>>>> b8bc2ce (domain transition)
+
