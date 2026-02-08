@@ -8,6 +8,7 @@ services:
     - "./backgrounds:/usr/src/app/backgrounds"
     - "./ssl:/usr/src/app/ssl"
     - "./cache:/usr/src/app/cache"
+    - "./docs:/usr/src/app/docs"
     deploy:
       resources:
         limits:

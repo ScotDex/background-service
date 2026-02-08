@@ -1,0 +1,61 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Socket.Kill Public API",
+    "version": "1.4.0",
+    "description": "High-performance EVE Online asset proxy."
+  },
+  "servers": [
+    {
+      "url": "https://api.socketkill.com:2053"
+    }
+  ],
+  "paths": {
+    "/render/ship/{typeId}": {
+      "get": {
+        "summary": "Get Ship Render",
+        "parameters": [
+          {
+            "name": "typeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/png": {}
+            }
+          }
+        }
+      }
+    },
+    "/render/corp/{corpId}": {
+      "get": {
+        "summary": "Get Corp Logo",
+        "parameters": [
+          {
+            "name": "corpId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/png": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

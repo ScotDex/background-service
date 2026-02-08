@@ -6,11 +6,18 @@ const cors = require('cors');
 const { pipeline } = require('node:stream/promises');
 const axios = require('axios'); // Ensure this is installed: npm install axios
 const cron = require('node-cron');
+const swaggerUi = require('swagger-ui-express');
 
 // --- Express App ---
 
 const app = express();
 app.use(cors());
+const specPath = path.join(__dirname, 'docs', 'openapi.json');
+const swaggerSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customSiteTitle: "Socket.Kill API Documentation"
+}));
 
 // --- Persistence Layer ---
 const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
@@ -118,6 +125,8 @@ async function refreshNPCKills () {
     }
     
 }
+
+
 
 // --- Corp Logo Proxy ---
 app.get('/render/corp/:corpId', async (req, res) => {
