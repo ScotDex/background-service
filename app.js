@@ -182,7 +182,7 @@ app.get('/random', (req, res) => {
         const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
         const randomImage = images[Math.floor(Math.random() * images.length)];
         res.json({
-            url: `https://api.socketkill.com:2053/images/${randomImage}`,
+            url: `https://api.socketkill.com/images/${randomImage}`,
             name: randomImage
         });
     });
