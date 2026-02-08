@@ -126,8 +126,6 @@ async function refreshNPCKills () {
     
 }
 
-
-
 // --- Corp Logo Proxy ---
 app.get('/render/corp/:corpId', async (req, res) => {
     const { corpId } = req.params;

@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api.socketkill.com:2053"
+      "url": "https://api.socketkill.com"
     }
   ],
   "paths": {
