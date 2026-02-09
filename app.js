@@ -5,7 +5,6 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios'); // Ensure this is installed: npm install axios
 const cron = require('node-cron');
-const swaggerUi = require('swagger-ui-express');
 const headerAgent = require('./middleware/headerAgent');
 const { paths, initStorage } = require('./storage/storage');
 const { getAsset } = require('./services/assetService');
@@ -16,19 +15,18 @@ const app = express();
 app.set('etag', false);
 app.use(cors());
 app.use(headerAgent);
-// 1. Serve the RAW JSON first (The Source of Truth)
+// Path to your spec file
 const specPath = path.join(__dirname, 'docs', 'openapi.json');
+const docsIndexPath = path.join(__dirname, 'docs', 'index.html');
+
+// 1. Serve the RAW JSON (For Redoc to fetch)
 app.get('/docs/openapi.json', (req, res) => {
-    // This bypasses the Swagger UI middleware entirely for the raw data
     res.sendFile(specPath);
 });
 
-// 2. Serve the Swagger UI (The Visual Wrapper)
-// Use /docs as the base for the UI dashboard
-app.use('/docs', swaggerUi.serve, (req, res, next) => {
-    const freshSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
-    // Pass the freshSpec into the setup
-    swaggerUi.setup(freshSpec)(req, res, next);
+// 2. Serve the Redoc HTML (The Zero-Memory Viewer)
+app.get('/docs', (req, res) => {
+    res.sendFile(docsIndexPath);
 });
 
 const CACHE_DIR = paths.rendersDir;
