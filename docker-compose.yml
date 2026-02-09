@@ -3,7 +3,7 @@ services:
     build: .
     restart: always
     ports:
-    - 2053:2053
+    - 8080:8080
     volumes:
     - "./backgrounds:/usr/src/app/backgrounds"
     - "./ssl:/usr/src/app/ssl"
