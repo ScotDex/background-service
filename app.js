@@ -12,9 +12,6 @@ const { getAsset } = require('./services/assetService');
 
 initStorage();
 
-
-// --- Express App ---
-
 const app = express();
 app.set('etag', false);
 app.use(cors());
