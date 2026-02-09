@@ -17,6 +17,7 @@ app.set('etag', false);
 app.use(cors());
 app.use(headerAgent);
 // 1. Serve the RAW JSON first (The Source of Truth)
+const specPath = path.join(__dirname, 'docs', 'openapi.json');
 app.get('/docs/openapi.json', (req, res) => {
     // This bypasses the Swagger UI middleware entirely for the raw data
     res.sendFile(specPath);
