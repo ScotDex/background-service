@@ -248,7 +248,7 @@ refreshServerStatus();
 refreshNPCKills();
 
 // --- Boot ---
-https.createServer(sslOptions, app).listen(2053, '0.0.0.0', () => {
+https.createServer(sslOptions, app).listen(8080, '0.0.0.0', () => {
     console.log("Image Proxy Online: https://api.socketkill.com:8080");
 });
 
