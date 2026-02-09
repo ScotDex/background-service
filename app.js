@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
-const { pipeline } = require('node:stream/promises');
 const axios = require('axios'); // Ensure this is installed: npm install axios
 const cron = require('node-cron');
 const swaggerUi = require('swagger-ui-express');
@@ -42,38 +41,45 @@ const sslOptions = {
 
 const BG_DIR = path.join(__dirname, 'backgrounds');
 app.use('/images', express.static(BG_DIR));
-const pendingRequests = new Map();
 
 app.get('/render/ship/:typeId', async (req, res) => {
     const { typeId } = req.params;
     const localPath = path.join(CACHE_DIR, `${typeId}.png`);
-    if (fs.existsSync(localPath)) {
-        return res.sendFile(localPath);
-    }
-    if (pendingRequests.has(typeId)) {
-        await pendingRequests.get(typeId);
-        return res.sendFile(localPath);
-    }
-    const fetchPromise = (async () => {
-        try {
-            const ccpUrl = `https://images.evetech.net/types/${typeId}/render?size=64`;
-            const response = await axios({ url: ccpUrl, responseType: 'stream' });
-            if (response.status !== 200) throw new Error('CCP Server Error');
-            await pipeline(response.data, fs.createWriteStream(localPath));
-        } catch (err) {
-            console.error(`[PROXY ERROR] Ship ${typeId}: ${err.message}`);
-            throw err;
-        } finally {
-            pendingRequests.delete(typeId);
-        }
-    })();
-    pendingRequests.set(typeId, fetchPromise);
+    const remoteUrl = `https://images.evetech.net/types/${typeId}/render?size=64`;
+
     try {
-        await fetchPromise;
+        await getAsset(`ship_${typeId}`, localPath, remoteUrl);
         res.sendFile(localPath);
     } catch (err) {
-        res.set('Cache-Control', 'no-store'); 
-        res.status(404).json({ error: "Ship render unavailable" });
+        res.set('Cache-Control', 'no-store').status(404).json({ error: "Ship render unavailable" });
+    }
+});
+
+app.get('/render/corp/:corpId', async (req, res) => {
+    const { corpId } = req.params;
+    const localPath = path.join(CORP_DIR, `${corpId}.png`);
+    const remoteUrl = `https://images.evetech.net/corporations/${corpId}/logo?size=64`;
+
+    try {
+        await getAsset(`corp_${corpId}`, localPath, remoteUrl);
+        res.sendFile(localPath);
+    } catch (err) {
+        res.set('Cache-Control', 'no-store').status(404).json({ error: "Corp logo unavailable" });
+    }
+});
+
+app.get('/render/market/:typeId', async (req, res) => {
+    const { typeId } = req.params;
+    const localPath = path.join(MARKET_DIR, `${typeId}.png`);
+    // Note: Items use /icon, Ships use /render
+    const remoteUrl = `https://images.evetech.net/types/${typeId}/icon?size=64`;
+
+    try {
+        // Use the 'market_' prefix to keep the Map keys unique
+        await getAsset(`market_${typeId}`, localPath, remoteUrl);
+        res.sendFile(localPath);
+    } catch (err) {
+        res.set('Cache-Control', 'no-store').status(404).json({ error: "Market icon unavailable" });
     }
 });
 
@@ -104,41 +110,7 @@ async function refreshNPCKills () {
     }
 }
 
-// --- Corp Logo Proxy ---
-app.get('/render/corp/:corpId', async (req, res) => {
-    const { corpId } = req.params;
-    const localPath = path.join(CORP_DIR, `${corpId}.png`);
-    if (fs.existsSync(localPath)) {
-        return res.sendFile(localPath);
-    }
-    const requestKey = `corp_${corpId}`; 
-    if (pendingRequests.has(requestKey)) {
-        await pendingRequests.get(requestKey);
-        return res.sendFile(localPath);
-    }
-    const fetchPromise = (async () => {
-        try {
-            const ccpUrl = `https://images.evetech.net/corporations/${corpId}/logo?size=64`;
-            const response = await axios({ url: ccpUrl, responseType: 'stream' });
-            if (response.status !== 200) throw new Error('CCP Server Error');
-            await pipeline(response.data, fs.createWriteStream(localPath));
-        } catch (err) {
-            console.error(`[PROXY ERROR] Corp ${corpId}: ${err.message}`);
-            throw err;
-        } finally {
-            pendingRequests.delete(requestKey);
-        }
-    })();
 
-    pendingRequests.set(requestKey, fetchPromise);
-    try {
-        await fetchPromise;
-        res.sendFile(localPath);
-    } catch (err) {
-        res.set('Cache-Control', 'no-store'); 
-        res.status(404).json({ error: "Corp logo unavailable" });
-    }
-});
 
 app.get('/random', (req, res) => {
     fs.readdir(BG_DIR, (err, files) => {
@@ -153,20 +125,6 @@ app.get('/random', (req, res) => {
     });
 });
 
-app.get('/render/market/:typeId', async (req, res) => {
-    const { typeId } = req.params;
-    const localPath = path.join(MARKET_DIR, `${typeId}.png`);
-    // Note: Items use /icon, Ships use /render
-    const remoteUrl = `https://images.evetech.net/types/${typeId}/icon?size=64`;
-
-    try {
-        // Use the 'market_' prefix to keep the Map keys unique
-        await getAsset(`market_${typeId}`, localPath, remoteUrl);
-        res.sendFile(localPath);
-    } catch (err) {
-        res.set('Cache-Control', 'no-store').status(404).json({ error: "Market icon unavailable" });
-    }
-});
 
 async function refreshServerStatus() {
     console.log(`[${new Date().toISOString()}] Refreshing EVE Status...`);
