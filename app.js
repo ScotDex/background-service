@@ -8,6 +8,10 @@ const axios = require('axios'); // Ensure this is installed: npm install axios
 const cron = require('node-cron');
 const swaggerUi = require('swagger-ui-express');
 const headerAgent = require('./middleware/headerAgent');
+const { paths, initStorage } = require('./storage/storage');
+
+initStorage();
+
 
 // --- Express App ---
 
@@ -22,19 +26,27 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customSiteTitle: "Socket.Kill API Documentation"
 }));
 
-// --- Persistence Layer ---
-const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
-const CORP_DIR = path.join(__dirname, 'cache', 'corps');
-const STATUS_DIR = path.join(__dirname, 'cache');
-const NPC_KILLS_CACHE_FILE = path.join(__dirname, 'cache', 'npc_kills.json');
-const NPC_LIFETIME_FILE = path.join(STATUS_DIR, 'npc_lifetime.json');
+const CACHE_DIR = paths.rendersDir;
+const CORP_DIR = paths.corpsDir;
+const STATUS_DIR = paths.statusDir;
+const NPC_KILLS_CACHE_FILE = paths.npcKillsFile;
+const NPC_LIFETIME_FILE = paths.npcLifetimeFile;
+const STATUS_CACHE_FILE = paths.serverStatusFile;
 
-const STATUS_CACHE_FILE = path.join(__dirname, 'cache', 'server_status.json');
+
+// --- Persistence Layer ---
+// const CACHE_DIR = path.join(__dirname, 'cache', 'renders');
+// const CORP_DIR = path.join(__dirname, 'cache', 'corps');
+// const STATUS_DIR = path.join(__dirname, 'cache');
+// const NPC_KILLS_CACHE_FILE = path.join(__dirname, 'cache', 'npc_kills.json');
+// const NPC_LIFETIME_FILE = path.join(STATUS_DIR, 'npc_lifetime.json');
+
+// const STATUS_CACHE_FILE = path.join(__dirname, 'cache', 'server_status.json');
 
 // -- Directory Creation ---
-if (!fs.existsSync(STATUS_DIR)) fs.mkdirSync(STATUS_DIR, { recursive: true });
-if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
-if (!fs.existsSync(CORP_DIR)) fs.mkdirSync(CORP_DIR, { recursive: true });
+// if (!fs.existsSync(STATUS_DIR)) fs.mkdirSync(STATUS_DIR, { recursive: true });
+// if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+// if (!fs.existsSync(CORP_DIR)) fs.mkdirSync(CORP_DIR, { recursive: true });
 
 // --- SSL Config ---
 const sslOptions = {
