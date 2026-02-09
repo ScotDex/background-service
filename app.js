@@ -20,7 +20,6 @@ const specPath = path.join(__dirname, 'docs', 'openapi.json');
 const swaggerSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 
 app.use('/docs', swaggerUi.serve, (req, res, next) => {
-    // Read fresh from disk on every request to /docs
     const freshSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
     swaggerUi.setup(freshSpec)(req, res, next);
 });
