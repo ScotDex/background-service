@@ -11,6 +11,7 @@ const swaggerUi = require('swagger-ui-express');
 // --- Express App ---
 
 const app = express();
+app.set('etag', false);
 app.use(cors());
 const specPath = path.join(__dirname, 'docs', 'openapi.json');
 const swaggerSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
