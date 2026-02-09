@@ -7,12 +7,14 @@ const { pipeline } = require('node:stream/promises');
 const axios = require('axios'); // Ensure this is installed: npm install axios
 const cron = require('node-cron');
 const swaggerUi = require('swagger-ui-express');
+const headerAgent = require('./middleware/headerAgent');
 
 // --- Express App ---
 
 const app = express();
 app.set('etag', false);
 app.use(cors());
+app.use(headerAgent);
 const specPath = path.join(__dirname, 'docs', 'openapi.json');
 const swaggerSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 
@@ -53,7 +55,6 @@ app.get('/render/ship/:typeId', async (req, res) => {
 
     // 1. Serve from SSD if available
     if (fs.existsSync(localPath)) {
-        res.set('Cache-Control', 'public, max-age=31536000, immutable'); 
         return res.sendFile(localPath);
     }
 
@@ -85,7 +86,7 @@ app.get('/render/ship/:typeId', async (req, res) => {
 
     try {
         await fetchPromise;
-        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        
         res.sendFile(localPath);
     } catch (err) {
         res.set('Cache-Control', 'no-store'); 
@@ -134,7 +135,6 @@ app.get('/render/corp/:corpId', async (req, res) => {
 
     // 1. Serve from SSD if available
     if (fs.existsSync(localPath)) {
-        res.set('Cache-Control', 'public, max-age=31536000, immutable'); 
         return res.sendFile(localPath);
     }
 
@@ -167,7 +167,6 @@ app.get('/render/corp/:corpId', async (req, res) => {
 
     try {
         await fetchPromise;
-        res.set('Cache-Control', 'public, max-age=31536000, immutable');
         res.sendFile(localPath);
     } catch (err) {
         res.set('Cache-Control', 'no-store'); 
@@ -231,7 +230,6 @@ app.get('/stats/npc-kills', async (req, res) => {
             return res.status(503).json({ error: "NPC data initializing..." });
         }
         const data = await fs.promises.readFile(NPC_KILLS_CACHE_FILE, 'utf8');
-        res.set('Cache-Control', 'public, max-age=300'); // Tell client to cache for 5 mins
         res.json(JSON.parse(data));
     } catch (err) {
         res.status(500).json({ error: err.message });
