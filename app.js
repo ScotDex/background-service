@@ -16,11 +16,17 @@ const app = express();
 app.set('etag', false);
 app.use(cors());
 app.use(headerAgent);
-const specPath = path.join(__dirname, 'docs', 'openapi.json');
-const swaggerSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+// 1. Serve the RAW JSON first (The Source of Truth)
+app.get('/docs/openapi.json', (req, res) => {
+    // This bypasses the Swagger UI middleware entirely for the raw data
+    res.sendFile(specPath);
+});
 
+// 2. Serve the Swagger UI (The Visual Wrapper)
+// Use /docs as the base for the UI dashboard
 app.use('/docs', swaggerUi.serve, (req, res, next) => {
     const freshSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+    // Pass the freshSpec into the setup
     swaggerUi.setup(freshSpec)(req, res, next);
 });
 
