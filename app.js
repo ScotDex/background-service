@@ -117,17 +117,29 @@ async function refreshNPCKills () {
 
 app.get('/random', (req, res) => {
     fs.readdir(BG_DIR, (err, files) => {
-        if (err || !files.length) return res.status(500).json({ error: "No images found" });
+        if (err || !files.length) return res.status(500).send('No images found');
+        
         const validExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
         const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
         const randomImage = images[Math.floor(Math.random() * images.length)];
-        res.json({
-            url: `https://api.socketkill.com/images/${randomImage}`,
-            name: randomImage
-        });
+        
+        // Serve the actual image file
+        const imagePath = path.join(BG_DIR, randomImage);
+        const ext = path.extname(randomImage).toLowerCase();
+        
+        // Set proper content-type
+        const contentType = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.webp': 'image/webp'
+        }[ext] || 'image/jpeg';
+        
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'public, max-age=300'); // Cache 5 min
+        res.sendFile(imagePath);
     });
 });
-
 
 async function refreshServerStatus() {
     console.log(`[${new Date().toISOString()}] Refreshing EVE Status...`);
