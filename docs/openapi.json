@@ -41,7 +41,7 @@
     },
     "/random": {
       "get": {
-        "summary": "",
+        "summary": "Get Eve Photography Image",
         "description": "Returns a photography image produced by @RixxJavix",
         "parameters": [],
         "responses": {
