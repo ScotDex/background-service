@@ -39,7 +39,26 @@
         }
       }
     },
-    "/render/corp/{corpId}": {
+    "/random": {
+      "get": {
+        "summary": "",
+        "description": "Returns a photography image produced by @RixxJavix",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {}
+            }
+          },
+          "404": {
+            "description": "Image not found"
+          }
+        }
+      }
+    },
+        "/render/corp/{corpId}": {
       "get": {
         "summary": "Get Corp Logo",
         "description": "Returns a 64x64 PNG logo for the specified corporation.",
