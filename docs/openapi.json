@@ -3,7 +3,7 @@
   "info": {
     "title": "Socket.Kill Public API",
     "version": "1.5.0",
-    "description": "High-performance EVE Online asset proxy serving ships, corporations, and market items."
+    "description": "High-performance EVE Online asset proxy serving ships, corporations, and market items. Please add credit via a link to socketkill.com, additionally web socket usage is available but whitelist based, if you wish to use it please feel free to get in touch."
   },
   "servers": [
     {
