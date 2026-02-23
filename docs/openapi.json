@@ -3,7 +3,7 @@
   "info": {
     "title": "Socket.Kill Public API",
     "version": "1.5.0",
-    "description": "High-performance EVE Online asset proxy serving ships, corporations, and market items. Please add credit via a link to socketkill.com, additionally web socket usage is available but whitelist based, if you wish to use it please feel free to get in touch."
+    "description": "A high-performance image proxy built for EVE Online, serving ship renders, corporation logos, and market item icons with low latency and high availability.\n\nFree to use for personal and third-party projects. If you integrate this API into your tool or application, a credit link back to socketkill.com is appreciated.\n\nWebSocket Access: A real-time killmail stream is available via WebSocket for approved integrations. Access is whitelist-based — if you'd like to connect your application to the live feed, get in touch and we can discuss your use case."
   },
   "servers": [
     {
