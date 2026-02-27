@@ -9,9 +9,9 @@ A high-performance "sidecar" service designed to serve randomized high-fidelity 
 - **Cloudflare Edge Optimized**: Caching implemeted, leveraging Cloudflare's global edge network to offload bandwidth from the origin.
 
 ## Asset Credits
-Background imagery used with the express permission of **Rixx Javix** (@RixxJavix). 
+- Background imagery used with the express permission of **Rixx Javix** (@RixxJavix). 
 *Check out more of his incredible EVE Online photography and art at [Flickr](https://www.flickr.com/photos/rixxjavix/albums/).*
-And of course CCP and their image server - (https://developers.eveonline.com/docs/services/image-server/)
+- CCP Image Server - (https://developers.eveonline.com/docs/services/image-server/)
 
 ## API Documentation
 https://api.socketkill.com/docs/
