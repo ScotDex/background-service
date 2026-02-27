@@ -12,13 +12,6 @@ A high-performance "sidecar" service designed to serve randomized high-fidelity 
 Background imagery used with the express permission of **Rixx Javix** (@RixxJavix). 
 *Check out more of his incredible EVE Online photography and art at [Flickr](https://www.flickr.com/photos/rixxjavix/albums/).*
 
-## API Endpoints
+## API Documentation
 
-### `GET /random`
-Returns a JSON object containing the URL and filename of a random nebula from the local collection.
-**Response:**
-```json
-{
-  "url": "[https://api.voidspark.org:2053/images/nebula_alpha.jpg](https://api.voidspark.org:2053/images/nebula_alpha.jpg)",
-  "name": "nebula_alpha.jpg"
-}
+https://api.socketkill.com/docs/
