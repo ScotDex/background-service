@@ -1,17 +1,17 @@
-# Nebula & Asset Provider Service
+# Image Proxy Service
 
 A high-performance "sidecar" service designed to serve randomized high-fidelity space backgrounds and **cached ship renders** for the **Socket.Kill** intel platform.
 
 ## Features
-- **Decoupled Architecture**: Isolated service prevents heavy image I/O and SSL overhead from blocking the main intel engine.
+- **Decoupled Architecture**: Isolated service prevents heavy image I/O and SSL overhead from blocking the main performance engine.
 - **Ship Render Proxy**: Intercepts CCP image requests, caches them locally on Premium SSD, and serves them with `immutable` headers for 1ms performance.
 - **Request Coalescing**: Prevents "Thundering Herd" syndrome by ensuring each unique Ship TypeID is only downloaded once, even during high-traffic fleet fights.
-- **Cloudflare Edge Optimized**: Operates on Port 2053, leveraging Cloudflare's global edge network to offload bandwidth from the origin.
+- **Cloudflare Edge Optimized**: Caching implemeted, leveraging Cloudflare's global edge network to offload bandwidth from the origin.
 
 ## Asset Credits
 Background imagery used with the express permission of **Rixx Javix** (@RixxJavix). 
 *Check out more of his incredible EVE Online photography and art at [Flickr](https://www.flickr.com/photos/rixxjavix/albums/).*
+And of course CCP and their image server - (https://developers.eveonline.com/docs/services/image-server/)
 
 ## API Documentation
-
 https://api.socketkill.com/docs/
