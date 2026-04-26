@@ -31,6 +31,7 @@ app.get('/docs', (req, res) => {
 
 const CACHE_DIR = paths.rendersDir;
 const CORP_DIR = paths.corpsDir;
+const ALLIANCE_DIR = paths.allianceDir;
 const STATUS_DIR = paths.statusDir;
 const MARKET_DIR = paths.marketDir;
 const NPC_KILLS_CACHE_FILE = paths.npcKillsFile;
@@ -68,6 +69,19 @@ app.get('/render/corp/:corpId', async (req, res) => {
         res.sendFile(localPath);
     } catch (err) {
         res.set('Cache-Control', 'no-store').status(404).json({ error: "Corp logo unavailable" });
+    }
+});
+
+app.get('/render/alliance/:allianceId', async (req, res) => {
+    const { allianceId } = req.params;
+    const localPath = path.join(ALLIANCE_DIR, `${allianceId}.png`);
+    const remoteUrl = `https://images.evetech.net/alliances/${allianceId}/logo?size=64`;
+
+    try {
+        await getAsset(`alliance_${allianceId}`, localPath, remoteUrl);
+        res.sendFile(localPath);
+    } catch (err) {
+        res.set('Cache-Control', 'no-store').status(404).json({ error: "Alliance logo unavailable" });
     }
 });
 
