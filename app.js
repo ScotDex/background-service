@@ -48,11 +48,20 @@ app.use('/images', express.static(BG_DIR));
 
 app.get('/render/ship/:typeId', async (req, res) => {
     const { typeId } = req.params;
-    const localPath = path.join(CACHE_DIR, `${typeId}.png`);
-    const remoteUrl = `https://images.evetech.net/types/${typeId}/render?size=64`;
+
+    // ↓ validation block goes here, before path/URL construction
+    const VALID_SIZES = [32, 64, 128, 256, 512, 1024];
+    const size = parseInt(req.query.size) || 64;
+    if (!VALID_SIZES.includes(size)) {
+        return res.status(400).json({ error: "Invalid size" });
+    }
+    // ↑
+
+    const localPath = path.join(CACHE_DIR, `${typeId}_${size}.png`);
+    const remoteUrl = `https://images.evetech.net/types/${typeId}/render?size=${size}`;
 
     try {
-        await getAsset(`ship_${typeId}`, localPath, remoteUrl);
+        await getAsset(`ship_${typeId}_${size}`, localPath, remoteUrl);
         res.sendFile(localPath);
     } catch (err) {
         res.set('Cache-Control', 'no-store').status(404).json({ error: "Ship render unavailable" });
