@@ -3,7 +3,7 @@
   "info": {
     "title": "Socket.Kill Public API",
     "version": "1.5.0",
-    "description": "A high-performance image proxy built for EVE Online, serving ship renders, corporation logos, and market item icons with low latency and high availability.\n\nFree to use for personal and third-party projects. If you integrate this API into your tool or application, a credit link back to socketkill.com is appreciated.\n\nWebSocket Access: A real-time killmail stream is available via WebSocket for approved integrations. Access is whitelist-based — if you'd like to connect your application to the live feed, get in touch and we can discuss your use case."
+    "description": "Image Proxy server originally developed to provide the main socketkill.com site with high performance local image caching then extended to be made public \n\nFree to use for personal and third-party projects. If you integrate this API into your tool or application, a credit link back to socketkill.com is appreciated.\n\nWebSocket Access: the information provided to the front end can be accessed publicly via a websocket for those who would like to use it, currently whitelist based purely for the fact I like having money in my bank account."
   },
   "servers": [
     {
