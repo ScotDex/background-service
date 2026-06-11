@@ -49,8 +49,6 @@ app.use('/images', express.static(BG_DIR));
 
 app.get('/render/ship/:typeId', async (req, res) => {
     const { typeId } = req.params;
-
-    // ↓ validation block goes here, before path/URL construction
     const VALID_SIZES = [32, 64, 128, 256, 512, 1024];
     const size = parseInt(req.query.size) || 64;
     if (!VALID_SIZES.includes(size)) {
@@ -163,7 +161,7 @@ app.get('/random', (req, res) => {
         res.sendFile(imagePath);
     });
 });
-
+console.log("[DEBUG] Absolute Kills Path:", KILLS_DIR);
 app.get('/kills', (req, res) => {
     fs.readdir(KILLS_DIR, (err, files) => {
         if (err || !files.length) return res.status(500).send('No images found');
