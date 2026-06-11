@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios'); // Ensure this is installed: npm install axios
+const axios = require('axios'); 
 const cron = require('node-cron');
 const headerAgent = require('./middleware/headerAgent');
 const { paths, initStorage } = require('./storage/storage');
@@ -19,7 +19,7 @@ app.use(headerAgent);
 const specPath = path.join(__dirname, 'docs', 'openapi.json');
 const docsIndexPath = path.join(__dirname, 'docs', 'index.html');
 
-// 1. Serve the RAW JSON (For Redoc to fetch)
+
 app.get('/docs/openapi.json', (req, res) => {
     res.sendFile(specPath);
 });
@@ -44,6 +44,7 @@ const sslOptions = {
 };
 
 const BG_DIR = path.join(__dirname, 'backgrounds');
+const KILLS_DIR = path.join(__dirname, 'kills');
 app.use('/images', express.static(BG_DIR));
 
 app.get('/render/ship/:typeId', async (req, res) => {
@@ -97,7 +98,6 @@ app.get('/render/alliance/:allianceId', async (req, res) => {
 app.get('/render/market/:typeId', async (req, res) => {
     const { typeId } = req.params;
     const localPath = path.join(MARKET_DIR, `${typeId}.png`);
-    // Note: Items use /icon, Ships use /render
     const remoteUrl = `https://images.evetech.net/types/${typeId}/icon?size=64`;
 
     try {
@@ -148,6 +148,32 @@ app.get('/random', (req, res) => {
         
         // Serve the actual image file
         const imagePath = path.join(BG_DIR, randomImage);
+        const ext = path.extname(randomImage).toLowerCase();
+        
+        // Set proper content-type
+        const contentType = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.webp': 'image/webp'
+        }[ext] || 'image/jpeg';
+        
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'public, max-age=300'); // Cache 5 min
+        res.sendFile(imagePath);
+    });
+});
+
+app.get('/kills', (req, res) => {
+    fs.readdir(KILLS_DIR, (err, files) => {
+        if (err || !files.length) return res.status(500).send('No images found');
+        
+        const validExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+        const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
+        const randomImage = images[Math.floor(Math.random() * images.length)];
+        
+        // Serve the actual image file
+        const imagePath = path.join(KILLS_DIR, randomImage);
         const ext = path.extname(randomImage).toLowerCase();
         
         // Set proper content-type
