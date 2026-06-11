@@ -37,6 +37,7 @@ const MARKET_DIR = paths.marketDir;
 const NPC_KILLS_CACHE_FILE = paths.npcKillsFile;
 const NPC_LIFETIME_FILE = paths.npcLifetimeFile;
 const STATUS_CACHE_FILE = paths.serverStatusFile;
+const KILLS_DIR = paths.killDir;
 
 const sslOptions = {
     key: fs.readFileSync(path.join(__dirname, 'ssl', 'socketkillcom.key')),
@@ -44,7 +45,6 @@ const sslOptions = {
 };
 
 const BG_DIR = path.join(__dirname, 'backgrounds');
-const KILLS_DIR = path.join(__dirname, 'kills');
 app.use('/images', express.static(BG_DIR));
 
 app.get('/render/ship/:typeId', async (req, res) => {
